@@ -7,6 +7,7 @@ import { ServiceConfig } from '~/shared/config';
  * @param { ServiceConfig } config
  */
 export async function create (config: ServiceConfig): Promise<any> {
+  // For each consumer defined in config, call `new Consumer()`
   
 }
 
