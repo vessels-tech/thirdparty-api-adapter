@@ -246,18 +246,36 @@ declare module '@mojaloop/central-services-shared' {
       TP_CONSENT_PUT_ERROR: string;
     };
   }
+
+  enum EventTypeEnum {
+    AUTHORIZATION = 'AUTHORIZATION',
+    NOTIFICATION = 'NOTIFICATION',
+    TRANSACTION_REQUEST = 'TRANSACTION_REQUEST',
+  }
+
+  enum EventActionEnum {
+    POST = 'POST',
+    PUT = 'PUT',
+  }
+
   interface Enum {
     Http: HttpEnum;
     EndPoints: EndPointsEnum;
+    Kafka: {
+      Config: {
+        CONSUMER: string
+      }
+    }
     Events: {
       Event: {
         Action: {
-          POST: string;
-          PUT: string;
+          POST: EventActionEnum.POST;
+          PUT: EventActionEnum.PUT;
         };
         Type: {
-          AUTHORIZATION: string;
-          TRANSACTION_REQUEST: string;
+          AUTHORIZATION: EventTypeEnum.AUTHORIZATION;
+          NOTIFICATION: EventTypeEnum.NOTIFICATION;
+          TRANSACTION_REQUEST: EventTypeEnum.TRANSACTION_REQUEST;
         };
       };
     };

@@ -26,6 +26,29 @@ import rc from 'rc'
 import parse from 'parse-strings-in-object'
 import Config from '../../config/default.json'
 import Package from '../../package.json'
+
+// TODO: move this to ambient.d.ts?
+export interface KafkaConsumerConfig {
+  options: {
+    mode: number,
+    batchSize: number,
+    pollFrequency: number,
+    recursiveTimeout: number,
+    messageCharset: string,
+    messageAsJSON: boolean,
+    sync: boolean
+    consumeTimeout: number
+  },
+  rdkafkaConf: {
+    'client.id': string,
+    'group.id': string
+    'metadata.broker.list': string,
+    'socket.keepalive.enable': boolean
+  },
+  topicConf: {
+    'auto.offset.reset': string
+  }
+}
 export interface ServiceConfig {
   // package.json
   PACKAGE: object;
@@ -64,6 +87,18 @@ export interface ServiceConfig {
       };
     };
   };
+  // TODO: decide how opinionated/relaxed this config should be
+  
+  KAFKA: {
+    CONSUMER: {
+      NOTIFICATION: {
+        EVENT: {
+          config: KafkaConsumerConfig
+        }
+      }
+
+    }
+  }
 }
 
 const RC = parse(rc('THIRD_PARTY', Config)) as ServiceConfig
