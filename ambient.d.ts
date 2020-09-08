@@ -23,7 +23,6 @@
  ******/
 
 
-
 // for mojaloop there is lack for @types files
 // to stop typescript complains, we have to declare some modules here
 declare module '@mojaloop/central-services-logger'
@@ -372,14 +371,19 @@ declare module '@mojaloop/central-services-stream' {
     }
   }
 
-  // TODO: figure out a better example of a message
+  // TODO: figure out a better example of a message - we may need to just do some stringifying
   type Message = any;
+  interface GetMetadataResult {
+    topics: Array<{
+      name: string
+    }>
+  }
   class Consumer extends EventEmitter {
     constructor(topics: Array<any>, config: KafkaConsumerConfig)
     connect(): Promise<boolean>;
-    consume(workDoneCb: (error: any, payload: Message | Array<Message>) => Promise<any>): void
+    consume(workDoneCb: (error: Error, payload: Message | Array<Message>) => Promise<any>): void
     disconnect(cb: () => any): void;
-    getMetadata(options: any, cb: () => any): void;
+    getMetadata(options: any, cb: (err: any, result: GetMetadataResult) => any): void;
   }
 
   interface Kafka {
