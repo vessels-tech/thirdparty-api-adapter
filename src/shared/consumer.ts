@@ -31,7 +31,7 @@ export default class Consumer {
 
     // TODO: configure the logger here!!!
 
-    
+
     // Create the internal consumer
     this.rdKafkaConsumer = new StreamLib.Consumer([this.topicName], config.internalConfig)
 
@@ -84,7 +84,8 @@ export default class Consumer {
     if (!this.rdKafkaConsumer || !this.rdKafkaConsumer.disconnect) {
       throw new Error('Tried to disconnect from consumer, but consumer is not initialized')
     }
-
+    
+    // TODO: promisify this!
     return this.rdKafkaConsumer.disconnect()
   }
 }

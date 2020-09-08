@@ -371,8 +371,15 @@ declare module '@mojaloop/central-services-stream' {
       'auto.offset.reset': string
     }
   }
+
+  // TODO: figure out a better example of a message
+  type Message = any;
   class Consumer extends EventEmitter {
     constructor(topics: Array<any>, config: KafkaConsumerConfig)
+    connect(): Promise<boolean>;
+    consume(workDoneCb: (error: any, payload: Message | Array<Message>) => Promise<any>): void
+    disconnect(cb: () => any): void;
+    getMetadata(options: any, cb: () => any): void;
   }
 
   interface Kafka {

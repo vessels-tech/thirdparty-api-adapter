@@ -26,7 +26,6 @@ import rc from 'rc'
 import parse from 'parse-strings-in-object'
 import Config from '../../config/default.json'
 import Package from '../../package.json'
-import { EventTypeEnum, EventActionEnum } from '@mojaloop/central-services-shared'
 import { KafkaConsumerConfig } from '@mojaloop/central-services-stream'
 
 
