@@ -27,31 +27,9 @@ import parse from 'parse-strings-in-object'
 import Config from '../../config/default.json'
 import Package from '../../package.json'
 import { EventTypeEnum, EventActionEnum } from '@mojaloop/central-services-shared'
+import { KafkaConsumerConfig } from '@mojaloop/central-services-stream'
 
-// TODO: move this to ambient.d.ts?
-export interface KafkaConsumerConfig {
-  eventType: EventTypeEnum,
-  eventAction: EventActionEnum,
-  options: {
-    mode: number,
-    batchSize: number,
-    pollFrequency: number,
-    recursiveTimeout: number,
-    messageCharset: string,
-    messageAsJSON: boolean,
-    sync: boolean
-    consumeTimeout: number
-  },
-  rdkafkaConf: {
-    'client.id': string,
-    'group.id': string
-    'metadata.broker.list': string,
-    'socket.keepalive.enable': boolean
-  },
-  topicConf: {
-    'auto.offset.reset': string
-  }
-}
+
 export interface ServiceConfig {
   // package.json
   PACKAGE: object;

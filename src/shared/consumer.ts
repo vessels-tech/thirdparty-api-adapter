@@ -1,17 +1,16 @@
-import { EventTypeEnum, EventActionEnum, Enum } from '@mojaloop/central-services-shared'
+import { EventTypeEnum, EventActionEnum, Util } from '@mojaloop/central-services-shared'
+import StreamLib, { KafkaConsumerConfig } from '@mojaloop/central-services-stream'
 import { promisify } from 'util';
 
 // TODO: typings!!!
 
-const KafkaConsumer = require('@mojaloop/central-services-stream').Kafka.Consumer
-const KafkaUtil = require('@mojaloop/central-services-shared').Util.Kafka
+// const KafkaConsumer = require('@mojaloop/central-services-stream').Kafka.Consumer
 
 
 export interface InternalConsumerConfig {
   eventAction: EventActionEnum,
   eventType: EventTypeEnum,
-  // TODO: make strict!
-  rdKafkaConfig: any,
+  internalConfig: KafkaConsumerConfig,
 }
 
 
@@ -26,15 +25,16 @@ export default class Consumer {
 
   constructor(config: InternalConsumerConfig, topicTemplate: string, handlerFunc: (...args: any) => any) {
     // const topicConfig = KafkaUtil.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, ENUM.Events.Event.Type.NOTIFICATION, ENUM.Events.Event.Action.EVENT)
-    const topicConfig = KafkaUtil.createGeneralTopicConf(topicTemplate, config.eventType, config.eventAction)
+    const topicConfig = Util.Kafka.createGeneralTopicConf(topicTemplate, config.eventType, config.eventAction)
     this.topicName = topicConfig.topicName
-    const generalConfig = KafkaUtil.getKafkaConfig(config.rdKafkaConfig, Enum.Kafka.Config.CONSUMER, config.eventType.toUpperCase(), config.eventAction.toUpperCase())
-    // TODO: seems hacky to me...
-    // @ts-ignore
-    generalConfig.rdkafkaConf['client.id'] = this.topicName
+    config.internalConfig.rdkafkaConf['client.id'] = this.topicName
 
+    // TODO: configure the logger here!!!
+
+    
     // Create the internal consumer
-    this.rdKafkaConsumer = new KafkaConsumer([this.topicName], generalConfig)
+    this.rdKafkaConsumer = new StreamLib.Consumer([this.topicName], config.internalConfig)
+
     // TODO: not sure if we need to bind this?
     this.handlerFunc = handlerFunc
   }

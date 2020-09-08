@@ -23,6 +23,7 @@
  ******/
 
 
+
 // for mojaloop there is lack for @types files
 // to stop typescript complains, we have to declare some modules here
 declare module '@mojaloop/central-services-logger'
@@ -292,11 +293,16 @@ declare module '@mojaloop/central-services-shared' {
     sendRequest(url: string, headers: HapiUtil.Dictionary<string>, source: string, destination: string, method?: RestMethodsEnum, payload?: any, responseType?: string, span?: any, jwsSigner?: any): Promise<any>
   }
 
+  class Kafka {
+    createGeneralTopicConf(template: string, functionality: string, action: string, key?: string, partition?: number, opaqueKey?: any): {topicName: string, key: string | null, partition: number | null, opaqueKey: any }
+  }
+
   interface Util {
     Endpoints: Endpoints;
-    Request: Request;
     Hapi: any;
+    Kafka: Kafka;
     OpenapiBackend: any;
+    Request: Request;
   }
 
   const Enum: Enum
@@ -339,6 +345,44 @@ declare module '@mojaloop/central-services-error-handling' {
   export function ReformatFSPIOPError(error: any, apiErrorCode?: any, replyTo?: any, extensions?: any): FSPIOPError
   export function CreateFSPIOPError(apiErrorCode?: any, message?: any, cause?: any, replyTo?: any, extensions?: any, useDescriptionAsMessage?: boolean): FSPIOPError
 }
+declare module '@mojaloop/central-services-stream' {
+  import { EventEmitter } from 'events';
+  import { EventActionEnum, EventTypeEnum } from '@mojaloop/central-services-shared';
+  export interface KafkaConsumerConfig {
+    eventType: EventTypeEnum,
+    eventAction: EventActionEnum,
+    options: {
+      mode: number,
+      batchSize: number,
+      pollFrequency: number,
+      recursiveTimeout: number,
+      messageCharset: string,
+      messageAsJSON: boolean,
+      sync: boolean
+      consumeTimeout: number
+    },
+    rdkafkaConf: {
+      'client.id': string,
+      'group.id': string
+      'metadata.broker.list': string,
+      'socket.keepalive.enable': boolean
+    },
+    topicConf: {
+      'auto.offset.reset': string
+    }
+  }
+  class Consumer extends EventEmitter {
+    constructor(topics: Array<any>, config: KafkaConsumerConfig)
+  }
+
+  interface Kafka {
+    Consumer: Consumer
+  }
+
+
+  const Kafka: Kafka
+}
+
 
 declare module '@hapi/good'
 declare module 'hapi-openapi'
