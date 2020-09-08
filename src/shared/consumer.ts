@@ -10,15 +10,14 @@ export interface InternalConsumerConfig {
 
 /**
  * @class Consumer
- * @description A utility wrapper around the `@mojaloop/central-services-stream` Kafka Consumer
+ * @description A utility class that wraps around the `@mojaloop/central-services-stream` Kafka Consumer
  */
 export default class Consumer {
   topicName: string;
   rdKafkaConsumer: StreamLib.Consumer;
   handlerFunc: (...args: any) => any
 
-  constructor(config: InternalConsumerConfig, topicTemplate: string, handlerFunc: (...args: any) => any) {
-    // const topicConfig = KafkaUtil.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, ENUM.Events.Event.Type.NOTIFICATION, ENUM.Events.Event.Action.EVENT)
+  constructor (config: InternalConsumerConfig, topicTemplate: string, handlerFunc: (...args: any) => any) {
     const topicConfig = Util.Kafka.createGeneralTopicConf(topicTemplate, config.eventType, config.eventAction)
     this.topicName = topicConfig.topicName
     config.internalConfig.rdkafkaConf['client.id'] = this.topicName
@@ -37,9 +36,9 @@ export default class Consumer {
    * @function start
    * @description Start the consumer listening for kafka events
    */
-  async start(): Promise<void> {
+  async start (): Promise<void> {
     await this.rdKafkaConsumer.connect()
-    await this.rdKafkaConsumer.consume(this.handlerFunc)
+    this.rdKafkaConsumer.consume(this.handlerFunc)
   }
 
   /**
@@ -50,8 +49,6 @@ export default class Consumer {
    * @returns {true} - if connected
    * @throws {Error} - if we can't find the topic name, or the consumer is not connected
    */
-
-  
   async isConnected (): Promise<true>  {
     const getMetadataPromise = promisify(this.rdKafkaConsumer.getMetadata)
     const getMetadataConfig = {
