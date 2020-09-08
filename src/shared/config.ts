@@ -26,9 +26,12 @@ import rc from 'rc'
 import parse from 'parse-strings-in-object'
 import Config from '../../config/default.json'
 import Package from '../../package.json'
+import { EventTypeEnum, EventActionEnum } from '@mojaloop/central-services-shared'
 
 // TODO: move this to ambient.d.ts?
 export interface KafkaConsumerConfig {
+  eventType: EventTypeEnum,
+  eventAction: EventActionEnum,
   options: {
     mode: number,
     batchSize: number,
@@ -87,17 +90,15 @@ export interface ServiceConfig {
       };
     };
   };
-  // TODO: decide how opinionated/relaxed this config should be
-  
-  KAFKA: {
-    CONSUMER: {
-      NOTIFICATION: {
-        EVENT: {
-          config: KafkaConsumerConfig
-        }
-      }
 
-    }
+  KAFKA: {
+    TOPIC_TEMPLATES: {
+      GENERAL_TOPIC_TEMPLATE: {
+        TEMPLATE: string;
+        REGEX: string;
+      };
+    };
+    CONSUMER: Array<KafkaConsumerConfig>;
   }
 }
 

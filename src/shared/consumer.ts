@@ -1,20 +1,17 @@
 import { EventTypeEnum, EventActionEnum, Enum } from '@mojaloop/central-services-shared'
 import { promisify } from 'util';
 
+// TODO: typings!!!
 
 const KafkaConsumer = require('@mojaloop/central-services-stream').Kafka.Consumer
 const KafkaUtil = require('@mojaloop/central-services-shared').Util.Kafka
-// const ENUM = require('@mojaloop/central-services-shared').Enum
 
 
-export interface ConsumerConfig {
-  // TODO: rename
-  kafkaConfig: any,
-  topicTemplate: string,
-  // TODO: make refer to the proper enum type...
+export interface InternalConsumerConfig {
+  eventAction: EventActionEnum,
   eventType: EventTypeEnum,
-  eventAction: EventActionEnum
-
+  // TODO: make strict!
+  rdKafkaConfig: any,
 }
 
 
@@ -25,29 +22,30 @@ export interface ConsumerConfig {
 export default class Consumer {
   topicName: string;
   rdKafkaConsumer: any;
+  handlerFunc: (...args: any) => any
 
-  constructor(config: ConsumerConfig) {
-
+  constructor(config: InternalConsumerConfig, topicTemplate: string, handlerFunc: (...args: any) => any) {
     // const topicConfig = KafkaUtil.createGeneralTopicConf(Config.KAFKA_CONFIG.TOPIC_TEMPLATES.GENERAL_TOPIC_TEMPLATE.TEMPLATE, ENUM.Events.Event.Type.NOTIFICATION, ENUM.Events.Event.Action.EVENT)
-    const topicConfig = KafkaUtil.createGeneralTopicConf(config.topicTemplate, config.eventType, config.eventAction)
+    const topicConfig = KafkaUtil.createGeneralTopicConf(topicTemplate, config.eventType, config.eventAction)
     this.topicName = topicConfig.topicName
-    const generalConfig = KafkaUtil.getKafkaConfig(config.kafkaConfig, Enum.Kafka.Config.CONSUMER, config.eventType.toUpperCase(), config.eventAction.toUpperCase())
+    const generalConfig = KafkaUtil.getKafkaConfig(config.rdKafkaConfig, Enum.Kafka.Config.CONSUMER, config.eventType.toUpperCase(), config.eventAction.toUpperCase())
     // TODO: seems hacky to me...
     // @ts-ignore
     generalConfig.rdkafkaConf['client.id'] = this.topicName
 
-
     // Create the internal consumer
     this.rdKafkaConsumer = new KafkaConsumer([this.topicName], generalConfig)
+    // TODO: not sure if we need to bind this?
+    this.handlerFunc = handlerFunc
   }
 
   /**
    * @function start
    * @description Start the consumer listening for kafka events
    */
-  async start(callback: (...args: any) => any): Promise<void> {
+  async start(): Promise<void> {
     await this.rdKafkaConsumer.connect()
-    await this.rdKafkaConsumer.consume(callback)
+    await this.rdKafkaConsumer.consume(this.handlerFunc)
   }
 
   /**
@@ -58,7 +56,7 @@ export default class Consumer {
    * @returns {true} - if connected
    * @throws {Error} - if we can't find the topic name, or the consumer is not connected
    */
-  async isConnected ()  {
+  async isConnected (): Promise<true>  {
     const getMetadataPromise = promisify(this.rdKafkaConsumer.getMetadata)
     const getMetadataConfig = {
       topic: this.topicName,

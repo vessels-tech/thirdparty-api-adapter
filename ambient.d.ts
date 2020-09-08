@@ -254,6 +254,7 @@ declare module '@mojaloop/central-services-shared' {
   }
 
   enum EventActionEnum {
+    EVENT = 'EVENT',
     POST = 'POST',
     PUT = 'PUT',
   }
@@ -269,6 +270,7 @@ declare module '@mojaloop/central-services-shared' {
     Events: {
       Event: {
         Action: {
+          EVENT: EventActionEnum.EVENT;
           POST: EventActionEnum.POST;
           PUT: EventActionEnum.PUT;
         };
